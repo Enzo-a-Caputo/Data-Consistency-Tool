@@ -31,12 +31,14 @@ Then clone or copy the `consistency/` package into your project.
 
 ## Quick Start
 
+This example demonstrates how to perform hydrological consistency analysis by comparing a water level series with a rainfall reference. The run_app function launches an interactive dashboard to inspect and validate your time-series data.
+
 ```python
 import pandas as pd
 from consistency import run_app
 
 # Load primary time-series (e.g., water level)
-df_level = pd.read_excel("Nivel.xlsx", names=["Date", "Level"])
+df_level = pd.read_excel("level.xlsx", names=["Date", "Level"])
 df_level["Date"] = pd.to_datetime(df_level["Date"])
 
 # Optional: load a reference series (e.g., rainfall)
@@ -57,54 +59,6 @@ run_app(
 A browser window opens automatically at `http://localhost:8054`.
 
 ---
-
-## API Reference
-
-### `run_app`
-
-```python
-consistency.run_app(
-    df_primary,
-    df_secondary=None,
-    col_primary="Level",
-    col_secondary=None,
-    port=8054,
-    section_size=20000,
-    date_col="Date",
-)
-```
-
-Builds the application and starts the development server. This call is **blocking** — interrupt the kernel or process to stop the server.
-
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `df_primary` | `pd.DataFrame` | — | DataFrame containing the series to be inspected and edited. Must include `date_col` and `col_primary` columns. |
-| `df_secondary` | `pd.DataFrame` \| `None` | `None` | Read-only reference DataFrame displayed alongside the primary series. Not modified by the tool. |
-| `col_primary` | `str` | `"Level"` | Column name of the primary time-series values. |
-| `col_secondary` | `str` \| `None` | `None` | Column name in `df_secondary` to display on the secondary y-axis. |
-| `port` | `int` | `8054` | Port for the local development server. |
-| `section_size` | `int` | `20000` | Maximum number of points rendered per section. |
-| `date_col` | `str` | `"Date"` | Datetime column name (must exist in both DataFrames if secondary is provided). |
-
----
-
-### `build_app`
-
-```python
-app = consistency.build_app(
-    df_primary,
-    df_secondary=None,
-    col_primary="Level",
-    col_secondary=None,
-    section_size=20000,
-    date_col="Date",
-)
-```
-
-Same parameters as `run_app` (without `port`). Returns a configured `Dash` application instance without starting the server, useful for deploying with a custom WSGI server or embedding in a larger Dash app.
-
----
-
 ## Anomaly Categories
 
 The tool classifies each data point into one of four categories based on configurable thresholds:
@@ -130,9 +84,6 @@ All thresholds can be adjusted at runtime via the **Control Panel** and re-appli
 
 ## UI Walkthrough
 
-<img width="1888" height="922" alt="image" src="https://github.com/user-attachments/assets/81a5903d-bb2b-4006-bd69-817ed57637b1" />
-
-
 **Workflow:**
 
 1. **Inspect** — Navigate between sections using Prev / Next
@@ -148,6 +99,12 @@ All thresholds can be adjusted at runtime via the **Control Panel** and re-appli
 - "Reset zoom": fits the entire section in view and resets pan
 
 ---
+
+<img width="1888" height="922" alt="image" src="https://github.com/user-attachments/assets/81a5903d-bb2b-4006-bd69-817ed57637b1" />
+
+<img width="1890" height="920" alt="image" src="https://github.com/user-attachments/assets/e01160a2-48a7-4b05-add8-a3cf0f1963d1" />
+
+
 
 ## Internal Modules
 
