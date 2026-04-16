@@ -130,7 +130,8 @@ All thresholds can be adjusted at runtime via the **Control Panel** and re-appli
 
 ## UI Walkthrough
 
-![alt text](image.png)
+<img width="1888" height="922" alt="image" src="https://github.com/user-attachments/assets/81a5903d-bb2b-4006-bd69-817ed57637b1" />
+
 
 **Workflow:**
 
