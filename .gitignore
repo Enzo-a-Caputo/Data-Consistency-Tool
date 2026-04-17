@@ -20,3 +20,7 @@
 *.docx
 *.pdf
 *.rtf
+
+__pycache__/
+*.png
+*copy.ipynb
