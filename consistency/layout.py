@@ -2,7 +2,10 @@
 """
 consistency/layout.py
 ---------------------
-Dash HTML layout factory for the consistency tool.
+Dash HTML layout factories.
+
+- build_shell(): top-level navbar + URL router placeholder.
+- build_consistency_layout(): content for the consistency page.
 """
 
 from __future__ import annotations
@@ -13,13 +16,31 @@ import dash_bootstrap_components as dbc
 from .config import DEFAULT_LIM_POS, DEFAULT_LIM_NEG, DEFAULT_LIM_TRAV
 
 
-def build_layout() -> dbc.Container:
-    """Return the full Dash layout tree."""
+def build_shell() -> dbc.Container:
+    """Root layout: navbar + Location + page-content slot."""
+    return dbc.Container(fluid=True, className="p-0", children=[
+        dcc.Location(id="url", refresh=False),
+        dbc.Navbar(
+            dbc.Container([
+                dbc.NavbarBrand("Data Consistency Tool", className="fw-semibold text-white"),
+                dbc.Nav([
+                    dbc.NavItem(dbc.NavLink("Consistency", href="/",        active="exact",
+                                            className="text-white")),
+                    dbc.NavItem(dbc.NavLink("Filling",     href="/filling", active="exact",
+                                            className="text-white")),
+                ], className="ms-auto", navbar=True),
+            ], fluid=True),
+            color="primary", dark=True, className="mb-2",
+        ),
+        html.Div(id="page-content"),
+    ])
+
+
+def build_consistency_layout() -> dbc.Container:
+    """Return the consistency page layout tree."""
     _num = {"type": "number", "debounce": True}
 
     return dbc.Container(fluid=True, children=[
-
-        html.H4("Hydrometeorological Data Consistency", className="my-3"),
 
         # ── Indicator controls ────────────────────────────────────────────
         dbc.Card(dbc.CardBody(dbc.Row([

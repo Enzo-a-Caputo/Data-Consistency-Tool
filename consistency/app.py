@@ -12,13 +12,14 @@ import webbrowser
 from typing import Optional
 
 import pandas as pd
-from dash import Dash
+from dash import Dash, Input, Output
 import dash_bootstrap_components as dbc
 
 from .config import DEFAULT_SECTION_SIZE
 from .figure import filter_secondary
-from .layout import build_layout
+from .layout import build_shell, build_consistency_layout
 from .callbacks import register_callbacks
+from .filling import build_filling_layout, register_filling_callbacks
 
 
 def _load_section(df: pd.DataFrame, section: int, section_size: int) -> pd.DataFrame:
@@ -54,11 +55,13 @@ def build_app(
     date_col     : Datetime column name (must match in both DataFrames).
     """
     state: dict = {
-        "df":      df_primary.reset_index(drop=True).copy(),
-        "section": 0,
-        "pending": [],
-        "uirev":   1,   # must start at a truthy value — Plotly.js treats 0 as
-                        # "uirevision not set" and always resets zoom/pan
+        "df":           df_primary.reset_index(drop=True).copy(),
+        "section":      0,
+        "pending":      [],
+        "uirev":        1,   # must start at a truthy value — Plotly.js treats 0 as
+                             # "uirevision not set" and always resets zoom/pan
+        "fill_section": 0,
+        "fill_uirev":   1,
     }
     _df_ref = df_secondary.copy() if df_secondary is not None else None
 
@@ -78,7 +81,17 @@ def build_app(
         external_stylesheets=[dbc.themes.BOOTSTRAP],
         suppress_callback_exceptions=True,
     )
-    app.layout = build_layout()
+    app.layout = build_shell()
+
+    # URL router — swaps page content based on pathname.
+    @app.callback(
+        Output("page-content", "children"),
+        Input("url", "pathname"),
+    )
+    def _route(pathname):
+        if pathname == "/filling":
+            return build_filling_layout()
+        return build_consistency_layout()
 
     register_callbacks(
         app, state,
@@ -88,6 +101,13 @@ def build_app(
         col_primary   = col_primary,
         col_secondary = col_secondary,
         date_col      = date_col,
+    )
+
+    register_filling_callbacks(
+        app, state,
+        col_primary  = col_primary,
+        date_col     = date_col,
+        section_size = section_size,
     )
 
     return app
